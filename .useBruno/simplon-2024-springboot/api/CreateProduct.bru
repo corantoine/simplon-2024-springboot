@@ -1,17 +1,17 @@
 meta {
-  name: CreateUser
+  name: CreateProduct
   type: http
-  seq: 1
+  seq: 4
 }
 
 post {
-  url: {{host}}/api/users
+  url: {{host}}/api/products
   body: json
   auth: none
 }
 
 body:json {
-  {"username": "Coralie"}
+  {"product": "patate"}
 }
 
 body:form-urlencoded {

@@ -1,16 +1,11 @@
 package fr.simplon.api.controllers;
 
 import java.util.InputMismatchException;
-import java.util.List;
 import java.util.Optional;
 
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.GetMapping;
+import fr.simplon.api.Exceptions.InvalidCredentialException;
 import org.springframework.web.bind.annotation.ModelAttribute;
-import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import fr.simplon.api.models.User;
@@ -19,23 +14,28 @@ import fr.simplon.api.repositories.UserRepository;
 @RestController
 public class LoginController {
 
-    @Autowired
-    private UserRepository userRepository;
+    private final UserRepository userRepository;
+
+    public LoginController(UserRepository userRepository) {
+        this.userRepository = userRepository;
+    }
 
     @PostMapping("/login")
-    public Optional<User> createUser(
-        @ModelAttribute("username") String username,
-        @ModelAttribute("password") String password
-    ) {
-        return userRepository.findByUsernameAndPassword(username, password);
+    public User login(
+            @ModelAttribute("username") String username,
+            @ModelAttribute("password") String password
+    ) throws InvalidCredentialException {
+        return userRepository.findByUsernameAndPassword(username, password).orElseThrow(
+                () -> new InvalidCredentialException("Check Your credentials")
+        );
     }
 
     @PostMapping("/register")
-    public User createUser(
-        @ModelAttribute("username") String username,
-        @ModelAttribute("password") String password,
-        @ModelAttribute("passwordConfirm") String passwordConfirm,
-        @ModelAttribute("email") String email
+    public User register(
+            @ModelAttribute("username") String username,
+            @ModelAttribute("password") String password,
+            @ModelAttribute("passwordConfirm") String passwordConfirm,
+            @ModelAttribute("email") String email
     ) {
         if (password.equals(passwordConfirm)) {
             User user = new User(username);
